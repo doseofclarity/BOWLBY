@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Bowlby's Attachment Theory | MCN Review | Pillitteri</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <style>
+        .transition-all { transition: all 0.3s ease; }
+        .recall-mode .reveal-text {
+            background-color: #cbd5e1;
+            color: transparent;
+            border-radius: 0.375rem;
+            padding: 0 0.25rem;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+            box-shadow: inset 0 0 0 1px #94a3b8;
+        }
+        .recall-mode .reveal-text:hover,
+        .recall-mode .reveal-text.revealed {
+            background-color: #fed7aa;
+            color: #1e293b;
+            box-shadow: none;
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #b45309; border-radius: 8px; }
+        .content-section { animation: fade 0.3s ease; }
+        @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .quiz-feedback-correct { background-color: #dcfce7; border-left: 4px solid #22c55e; }
+        .quiz-feedback-wrong { background-color: #fee2e2; border-left: 4px solid #ef4444; }
+        .locked-section { opacity: 0.6; cursor: not-allowed; pointer-events: none; }
+        .flashcard { background: #fff; border-radius: 1rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); transition: transform 0.2s; cursor: pointer; }
+        .flashcard:hover { transform: translateY(-5px); }
+        .timeline-bar { background: linear-gradient(90deg, #fde68a, #b45309); height: 10px; border-radius: 5px; margin: 1rem 0; }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { bowlby: { light: '#fef3c7', DEFAULT: '#b45309', dark: '#78350f' } } } }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 h-screen flex flex-col md:flex-row font-sans text-slate-800 overflow-hidden">
+
+    <!-- Mobile Header -->
+    <div class="md:hidden bg-bowlby-dark text-white p-4 flex justify-between items-center shadow-md z-30 shrink-0">
+        <button onclick="toggleMobileMenu()" class="text-white focus:outline-none z-40">
+            <i class="fa-solid fa-bars text-2xl"></i>
+        </button>
+        <h1 class="font-bold text-lg absolute left-1/2 transform -translate-x-1/2 pointer-events-none">
+            <i class="fa-solid fa-heart mr-2"></i> Bowlby
+        </h1>
+        <div class="w-8"></div>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <nav id="sidebar" class="hidden md:flex flex-col w-full md:w-80 bg-white shadow-2xl h-full absolute md:relative z-30 transition-transform duration-300 shrink-0 border-r border-slate-200">
+        <div class="p-6 bg-gradient-to-br from-bowlby-dark to-bowlby text-white hidden md:block shrink-0">
+            <h1 class="font-black text-2xl tracking-wide"><i class="fa-regular fa-hand-peace mr-2"></i> Bowlby's Attachment Theory</h1>
+            <p class="text-sm text-amber-200 mt-1 font-medium">Adele Pillitteri · MCN</p>
+        </div>
+        <div class="flex-1 overflow-y-auto py-4">
+            <ul class="space-y-1 text-sm font-medium">
+                <li><button onclick="showSection('home')" id="btn-home" class="nav-btn w-full text-left px-6 py-3 bg-bowlby-light text-bowlby-dark border-r-4 border-bowlby-dark transition-colors"><i class="fa-solid fa-house w-6 nav-icon"></i><i class="fa-solid fa-lock w-6 hidden"></i> Home / Start</button></li>
+                <li><button onclick="showSection('overview')" id="btn-overview" class="nav-btn w-full text-left px-6 py-3 text-slate-700 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-book-open w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Overview & Core Concepts</button></li>
+                <li><button onclick="showSection('phases')" id="btn-phases" class="nav-btn w-full text-left px-6 py-3 text-slate-700 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-chart-line w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> 4 Phases of Attachment</button></li>
+                <li><button onclick="showSection('separation')" id="btn-separation" class="nav-btn w-full text-left px-6 py-3 text-slate-700 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-face-frown w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Separation Anxiety (Protest, Despair, Detachment)</button></li>
+                <li><button onclick="showSection('types')" id="btn-types" class="nav-btn w-full text-left px-6 py-3 text-slate-700 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-diagram-project w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Ainsworth's Attachment Types (Strange Situation)</button></li>
+                <li><button onclick="showSection('iwm')" id="btn-iwm" class="nav-btn w-full text-left px-6 py-3 text-slate-700 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-brain w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Internal Working Model & Deprivation</button></li>
+                <li><button onclick="showSection('nursing')" id="btn-nursing" class="nav-btn w-full text-left px-6 py-3 text-slate-700 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-user-nurse w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Nursing Implications & Interventions</button></li>
+                <li><button onclick="showSection('flashcards')" id="btn-flashcards" class="nav-btn w-full text-left px-6 py-3 text-slate-700 hover:bg-slate-50 transition-colors border-t border-slate-200 mt-2 locked-section"><i class="fa-solid fa-cards w-6 text-bowlby nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Flashcards & Mnemonics</button></li>
+                <li><button onclick="showSection('final_quiz_sec')" id="btn-final_quiz_sec" class="nav-btn w-full text-left px-6 py-3 text-slate-700 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-graduation-cap w-6 text-amber-500 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Final 50‑Item Exam</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="flex-1 h-full overflow-y-auto bg-slate-100 relative w-full">
+        <div class="fixed top-16 md:top-4 right-4 md:right-8 z-40 flex items-center bg-white/90 backdrop-blur px-4 py-3 rounded-full shadow-lg border border-slate-200 cursor-pointer hover:bg-slate-50 transition-colors" onclick="toggleRecallMode()">
+            <span class="mr-3 text-sm font-bold text-slate-700 hidden md:inline"><i class="fa-solid fa-brain text-bowlby mr-1"></i> Active Recall</span>
+            <button id="recall-toggle" class="w-12 h-6 bg-slate-300 rounded-full relative transition-colors duration-300 focus:outline-none shadow-inner pointer-events-none">
+                <div id="recall-knob" class="w-5 h-5 bg-white rounded-full absolute top-0.5 left-0.5 transition-transform duration-300 shadow"></div>
+            </button>
+        </div>
+
+        <div class="p-4 md:p-8 max-w-6xl mx-auto pb-32">
+            <!-- HOME SECTION -->
+            <section id="home" class="content-section flex flex-col items-center justify-center min-h-[80vh] text-center block">
+                <div class="bg-gradient-to-br from-slate-800 to-bowlby-dark text-white rounded-3xl shadow-2xl p-10 md:p-16 w-full relative overflow-hidden">
+                    <div class="absolute top-0 right-0 -mt-10 -mr-10 text-white opacity-5 pointer-events-none"><i class="fa-solid fa-hand-holding-heart text-[20rem]"></i></div>
+                    <div class="relative z-10">
+                        <div class="bg-white/10 backdrop-blur-sm inline-block p-4 rounded-full text-amber-300 mb-6 shadow-sm border border-white/20">
+                            <i class="fa-solid fa-book-open text-5xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-300 mb-2 uppercase tracking-widest">Maternal & Child Health Nursing</h3>
+                        <h1 class="text-4xl md:text-6xl font-black text-white mb-6 leading-tight drop-shadow-md">Bowlby's Attachment Theory</h1>
+                        <div class="bg-white/10 backdrop-blur inline-block px-6 py-3 rounded-full mb-10 border border-white/20">
+                            <p class="text-lg text-white font-medium">Phases · Types · Internal Working Model | <strong>Adele Pillitteri, 7e</strong></p>
+                        </div>
+                        <button onclick="unlockFirstSection()" class="bg-slate-600 hover:bg-slate-500 text-white font-black py-4 px-10 rounded-full shadow-xl transition-transform hover:scale-105 text-lg flex items-center mx-auto focus:outline-none">
+                            Begin Module <i class="fa-solid fa-arrow-right ml-3"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 1. OVERVIEW & CORE CONCEPTS -->
+            <section id="overview" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-4 border-b-2 border-bowlby pb-3"><i class="fa-solid fa-book-open text-bowlby mr-4"></i> Overview & Core Concepts</h2>
+                    <p><strong>John Bowlby (1907–1990)</strong> – British psychiatrist who developed Attachment Theory, emphasizing that <span class="reveal-text font-bold">attachment is a biologically instinctive bond</span> that ensures infant survival. The quality of early attachment affects lifelong emotional, social, and cognitive development.</p>
+                    <div class="grid md:grid-cols-2 gap-5 mt-4">
+                        <div class="bg-slate-50 p-4 rounded-xl"><strong>🔑 Key Concepts</strong><br><span class="reveal-text">Secure base, Internal working model, Separation anxiety, Maternal deprivation.</span></div>
+                        <div class="bg-amber-50 p-4 rounded-xl"><strong>📊 Mnemonic (4 phases):</strong><br><span class="reveal-text">"P.A.C.R." – Pre-attachment, Attachment-in-the-making, Clear-cut, Reciprocal.</span></div>
+                    </div>
+                    <div class="bg-bowlby-light p-3 rounded-lg mt-4"><i class="fa-regular fa-lightbulb"></i> <strong>Key concept:</strong> Attachment is not just a behavioral connection; it is an emotional bond that provides a sense of security.</div>
+                    <button onclick="openQuiz('overview')" class="mt-6 w-full bg-slate-800 text-white font-black py-3 rounded-xl">Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- 2. 4 PHASES OF ATTACHMENT -->
+            <section id="phases" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-4 border-b-2 border-bowlby pb-3"><i class="fa-solid fa-chart-line text-bowlby mr-4"></i> 4 Phases of Attachment (Bowlby)</h2>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm border-collapse border">
+                            <thead class="bg-bowlby text-white"><tr><th class="p-2">Phase</th><th class="p-2">Age</th><th class="p-2">Description</th></tr></thead>
+                            <tbody>
+                                <tr><td class="border p-2 font-bold">Pre-attachment</td><td class="reveal-text">Birth – 6 weeks</td><td class="reveal-text">Infant uses reflexes (crying, grasping, smiling) to attract caregivers; no discrimination.</td></tr>
+                                <tr class="bg-slate-50"><td class="border p-2 font-bold">Attachment-in-the-making</td><td class="reveal-text">6 weeks – 6–8 months</td><td class="reveal-text">Begins to prefer familiar caregivers; trust develops; separation protest minimal.</td></tr>
+                                <tr><td class="border p-2 font-bold">Clear-cut attachment</td><td class="reveal-text">6–8 months – 18–24 months</td><td class="reveal-text">Strong, specific attachment; separation anxiety and stranger anxiety peak; caregiver as secure base.</td></tr>
+                                <tr class="bg-slate-50"><td class="border p-2 font-bold">Formation of reciprocal relationship</td><td class="reveal-text">18–24 months +</td><td class="reveal-text">Child understands caregiver's comings and goings; can tolerate separations; mutual relationship.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="timeline-bar"></div>
+                    <div class="text-center text-sm font-bold text-bowlby">Attachment Phases Timeline</div>
+                    <button onclick="openQuiz('phases')" class="mt-6 w-full bg-slate-800 text-white font-black py-3 rounded-xl">Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- 3. SEPARATION ANXIETY (PROTEST, DESPAIR, DETACHMENT) -->
+            <section id="separation" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-4 border-b-2 border-bowlby pb-3"><i class="fa-solid fa-face-frown text-bowlby mr-4"></i> Separation Anxiety (Protest, Despair, Detachment)</h2>
+                    <p><strong>Bowlby's 3 stages of separation behavior:</strong></p>
+                    <div class="grid md:grid-cols-3 gap-4 mt-4">
+                        <div class="bg-red-50 p-4 rounded-xl"><strong>1️⃣ Protest 😭</strong><br><span class="reveal-text">Child cries, screams, searches for parent; may reject substitute caregivers.</span></div>
+                        <div class="bg-amber-50 p-4 rounded-xl"><strong>2️⃣ Despair 😔</strong><br><span class="reveal-text">Child becomes quiet, withdrawn, hopeless, apathetic; still misses parent.</span></div>
+                        <div class="bg-green-50 p-4 rounded-xl"><strong>3️⃣ Detachment 😶</strong><br><span class="reveal-text">Appears recovered but emotionally distant; may ignore or avoid parent upon return.</span></div>
+                    </div>
+                    <div class="bg-bowlby-light p-3 rounded-lg mt-4"><strong>⚠️ Nursing alert:</strong> Prolonged separation without consistent care can lead to lasting emotional damage and insecure attachment.</div>
+                    <button onclick="openQuiz('separation')" class="mt-6 w-full bg-slate-800 text-white font-black py-3 rounded-xl">Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- 4. AINSWORTH'S ATTACHMENT TYPES (STRANGE SITUATION) -->
+            <section id="types" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-4 border-b-2 border-bowlby pb-3"><i class="fa-solid fa-diagram-project text-bowlby mr-4"></i> Ainsworth's Attachment Types (Strange Situation)</h2>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm border-collapse border">
+                            <thead class="bg-bowlby text-white"><tr><th class="p-2">Type</th><th class="p-2">Child's Behavior (Strange Situation)</th><th class="p-2">Caregiver Style</th><th class="p-2">% Population</th></tr></thead>
+                            <tbody>
+                                <tr><td class="border p-2 font-bold">Secure (Type B)</td><td class="reveal-text">Distressed when caregiver leaves, quickly comforted on return; uses caregiver as secure base.</td><td class="reveal-text">Responsive, warm, consistent</td><td class="reveal-text">~60-70%</td></tr>
+                                <tr class="bg-slate-50"><td class="border p-2 font-bold">Insecure-Avoidant (Type A)</td><td class="reveal-text">Little distress when caregiver leaves; ignores on return; treats stranger similarly.</td><td class="reveal-text">Rejecting, emotionally distant, unresponsive</td><td class="reveal-text">~15-20%</td></tr>
+                                <tr><td class="border p-2 font-bold">Insecure-Ambivalent/Resistant (Type C)</td><td class="reveal-text">Intense distress on separation; seeks comfort but resists when offered; hard to soothe.</td><td class="reveal-text">Inconsistent, sometimes attentive, sometimes neglectful</td><td class="reveal-text">~10-15%</td></tr>
+                                <tr class="bg-slate-50"><td class="border p-2 font-bold">Disorganized/Disoriented (Type D)</td><td class="reveal-text">Contradictory behaviors (freezing, rocking, approaching then avoiding); dazed expression.</td><td class="reveal-text">Frightening, abusive, neglected, unresolved trauma</td><td class="reveal-text">~5-15% (higher in high-risk populations)</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="bg-amber-50 p-3 rounded-lg mt-4"><i class="fa-regular fa-message"></i> <strong>Mnemonic:</strong> "S.A.D." – Secure, Avoidant, Disorganized, plus Ambivalent (C).</div>
+                    <button onclick="openQuiz('types')" class="mt-6 w-full bg-slate-800 text-white font-black py-3 rounded-xl">Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- 5. INTERNAL WORKING MODEL & DEPRIVATION -->
+            <section id="iwm" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-4 border-b-2 border-bowlby pb-3"><i class="fa-solid fa-brain text-bowlby mr-4"></i> Internal Working Model & Maternal Deprivation</h2>
+                    <div class="grid md:grid-cols-2 gap-5">
+                        <div><strong>🧠 Internal Working Model (IWM)</strong><br><span class="reveal-text">Mental blueprint formed from early attachment experiences. Shapes expectations about self, others, and relationships. Secure attachment → positive IWM (trust, self-worth). Insecure attachment → negative IWM (anxiety, avoidance).</span></div>
+                        <div><strong>⚠️ Maternal Deprivation Hypothesis</strong><br><span class="reveal-text">Bowlby proposed that continuous care from a primary attachment figure during the first 2–3 years is essential. Prolonged deprivation leads to emotional coldness, delinquency, low IQ, and poor social relationships. Study: "44 Juvenile Thieves" showed high rates of early separations.</span></div>
+                    </div>
+                    <div class="bg-bowlby-light p-3 rounded-lg mt-4"><i class="fa-regular fa-clock"></i> <strong>Critical period:</strong> First 2–3 years of life for attachment formation.</div>
+                    <button onclick="openQuiz('iwm')" class="mt-6 w-full bg-slate-800 text-white font-black py-3 rounded-xl">Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- 6. NURSING IMPLICATIONS & INTERVENTIONS -->
+            <section id="nursing" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-4 border-b-2 border-bowlby pb-3"><i class="fa-solid fa-user-nurse text-bowlby mr-4"></i> Nursing Implications & Interventions</h2>
+                    <ul class="list-disc pl-6 space-y-2">
+                        <li><strong>Promote early bonding:</strong> <span class="reveal-text">Encourage skin-to-skin contact (kangaroo care), rooming‑in, breastfeeding, and parental presence during procedures.</span></li>
+                        <li><strong>Prevent unnecessary separation:</strong> <span class="reveal-text">Allow parents to stay during hospitalization; explain benefits of parental involvement.</span></li>
+                        <li><strong>Support responsive caregiving:</strong> <span class="reveal-text">Teach parents to recognize and respond to infant cues (crying, cooing, eye contact).</span></li>
+                        <li><strong>Identify attachment problems:</strong> <span class="reveal-text">Observe parent‑infant interaction, eye contact, holding, vocalization; refer if signs of neglect or emotional detachment.</span></li>
+                        <li><strong>Provide anticipatory guidance:</strong> <span class="reveal-text">Educate about normal separation anxiety (8 months) and how to ease transitions.</span></li>
+                        <li><strong>Support foster/adoptive families:</strong> <span class="reveal-text">Help parents understand attachment challenges and promote consistency and warmth.</span></li>
+                    </ul>
+                    <div class="bg-green-50 p-3 rounded-lg mt-4"><i class="fa-regular fa-heart"></i> <strong>Nursing mnemonic "C.A.R.E.":</strong> <span class="reveal-text">C – Consistent caregiver, A – Attentive to cues, R – Responsive interaction, E – Encourage bonding.</span></div>
+                    <button onclick="openQuiz('nursing')" class="mt-6 w-full bg-slate-800 text-white font-black py-3 rounded-xl">Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- 7. FLASHCARDS & MNEMONICS -->
+            <section id="flashcards" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-4 border-b-2 border-bowlby pb-3"><i class="fa-solid fa-cards text-bowlby mr-4"></i> Flashcards & Mnemonics</h2>
+                    <div class="grid md:grid-cols-2 gap-5">
+                        <div class="flashcard p-4 bg-white border border-amber-200" onclick="toggleFlash(this)">
+                            <div class="font-bold text-bowlby">Q: What are Bowlby's 4 phases of attachment?</div>
+                            <div class="flash-answer hidden mt-2 text-slate-600">Pre-attachment → Attachment-in-the-making → Clear-cut → Reciprocal relationship</div>
+                        </div>
+                        <div class="flashcard p-4 bg-white border border-amber-200" onclick="toggleFlash(this)">
+                            <div class="font-bold text-bowlby">Q: List Ainsworth's attachment types.</div>
+                            <div class="flash-answer hidden mt-2 text-slate-600">Secure, Avoidant, Ambivalent/Resistant, Disorganized</div>
+                        </div>
+                        <div class="flashcard p-4 bg-white border border-amber-200" onclick="toggleFlash(this)">
+                            <div class="font-bold text-bowlby">Q: What are the 3 stages of separation anxiety?</div>
+                            <div class="flash-answer hidden mt-2 text-slate-600">Protest → Despair → Detachment</div>
+                        </div>
+                        <div class="flashcard p-4 bg-white border border-amber-200" onclick="toggleFlash(this)">
+                            <div class="font-bold text-bowlby">Q: What is the Internal Working Model?</div>
+                            <div class="flash-answer hidden mt-2 text-slate-600">Mental blueprint from early attachment; shapes future relationships</div>
+                        </div>
+                        <div class="flashcard p-4 bg-white border border-amber-200" onclick="toggleFlash(this)">
+                            <div class="font-bold text-bowlby">Q: Secure attachment caregiver style?</div>
+                            <div class="flash-answer hidden mt-2 text-slate-600">Responsive, warm, consistent</div>
+                        </div>
+                        <div class="flashcard p-4 bg-white border border-amber-200" onclick="toggleFlash(this)">
+                            <div class="font-bold text-bowlby">Q: What did Bowlby's "44 Juvenile Thieves" study show?</div>
+                            <div class="flash-answer hidden mt-2 text-slate-600">Early maternal separations linked to delinquency</div>
+                        </div>
+                    </div>
+                    <div class="mt-6 bg-amber-50 p-4 rounded-xl"><strong>🧠 Mnemonic "P.A.C.R." – Phases</strong><br><span class="reveal-text">Pre-attachment, Attachment-in-the-making, Clear-cut, Reciprocal.</span></div>
+                    <div class="mt-3 bg-amber-50 p-4 rounded-xl"><strong>🧠 Mnemonic "P.D.D." – Separation stages</strong><br><span class="reveal-text">Protest, Despair, Detachment.</span></div>
+                    <button onclick="openQuiz('flashcards')" class="mt-6 w-full bg-slate-800 text-white font-black py-3 rounded-xl">Take Quiz → Unlock Final Exam</button>
+                </div>
+            </section>
+
+            <!-- FINAL EXAM SECTION -->
+            <section id="final_quiz_sec" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 text-center min-h-[60vh] flex flex-col justify-center items-center">
+                    <i class="fa-solid fa-graduation-cap text-8xl text-amber-500 mb-6"></i>
+                    <h2 class="text-4xl font-black text-slate-800 mb-4">Final 50‑Item Exam: Bowlby's Attachment Theory</h2>
+                    <p class="text-lg text-slate-600 mb-8 max-w-2xl">Covers phases, separation stages, attachment types, internal working model, nursing implications, and mnemonics. Score ≥75% to pass.</p>
+                    <button onclick="openQuiz('final_quiz')" class="w-full max-w-md bg-slate-800 text-white font-black py-4 rounded-xl shadow-md text-xl">Start Final Exam</button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- QUIZ MODAL -->
+    <div id="quiz-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4">
+        <div class="bg-white w-full max-w-3xl rounded-2xl shadow-2xl p-6 md:p-8 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeQuiz()" class="absolute top-4 right-4 text-slate-400 hover:text-red-500"><i class="fa-solid fa-xmark text-2xl"></i></button>
+            <h2 id="quiz-title" class="text-3xl font-black text-slate-800 mb-2"></h2>
+            <div id="quiz-questions-container" class="space-y-4 mt-4"></div>
+            <button id="quiz-submit-btn" onclick="submitQuiz()" class="mt-8 w-full bg-bowlby text-white font-bold py-4 rounded-xl shadow-lg">Submit Answers</button>
+            <div id="quiz-result-container" class="hidden mt-6 p-4 rounded-xl bg-slate-100"></div>
+        </div>
+    </div>
+
+    <script>
+        let unlockedSections = ['home'];
+        // QUIZZES (10 questions each)
+        const quizzes = {
+            overview: { title: "Overview & Core Concepts", next: "phases", questions: [
+                { q: "Attachment theory was developed by:", options: ["Erikson", "Bandura", "Bowlby", "Freud"], ans: 2 },
+                { q: "Bowlby believed attachment is:", options: ["Learned through conditioning", "Biologically instinctive", "Purely cognitive", "Result of punishment"], ans: 1 },
+                { q: "A secure base refers to:", options: ["A safe room", "Caregiver that provides safety for exploration", "A type of crib", "Hospital policy"], ans: 1 },
+                { q: "The internal working model is formed during:", options: ["Adolescence", "Early attachment experiences", "School age", "Adulthood"], ans: 1 },
+                { q: "Separation anxiety typically begins around:", options: ["2 weeks", "2 months", "6–8 months", "12 months"], ans: 2 },
+                { q: "Maternal deprivation hypothesis states that continuous care is essential during the first:", options: ["6 months", "1 year", "2-3 years", "5 years"], ans: 2 },
+                { q: "A child who uses mother as a secure base and is distressed at separation but easily comforted has:", options: ["Avoidant attachment", "Secure attachment", "Ambivalent attachment", "Disorganized attachment"], ans: 1 },
+                { q: "Bowlby's famous study was called:", options: ["Bobo doll", "Little Albert", "44 Juvenile Thieves", "Strange Situation"], ans: 2 },
+                { q: "The first phase of attachment is called:", options: ["Clear-cut", "Pre-attachment", "Reciprocal", "Attachment-in-the-making"], ans: 1 },
+                { q: "Which of the following is NOT a phase of separation response?", options: ["Protest", "Despair", "Denial", "Detachment"], ans: 2 }
+            ]},
+            phases: { title: "4 Phases of Attachment", next: "separation", questions: [
+                { q: "During pre-attachment (0–6 weeks), infants:", options: ["Show strong preference for mother", "Use reflexes to attract caregivers, no discrimination", "Experience stranger anxiety", "Form reciprocal relationship"], ans: 1 },
+                { q: "Attachment-in-the-making occurs at:", options: ["0–6 weeks", "6 weeks – 6–8 months", "6–8 months – 18 months", "18–24 months+"], ans: 1 },
+                { q: "Clear-cut attachment is characterized by:", options: ["No separation protest", "Stranger anxiety and secure base behavior", "Indifference to caregiver", "Only crying"], ans: 1 },
+                { q: "In the reciprocal phase, a child can:", options: ["Understand caregiver's departures and tolerate short separations", "Never tolerate separation", "Only stay with mother", "Show no attachment"], ans: 0 },
+                { q: "Which phase shows the strongest, most specific attachment?", options: ["Pre-attachment", "Attachment-in-the-making", "Clear-cut attachment", "Reciprocal"], ans: 2 },
+                { q: "The phase where a child actively seeks proximity to caregiver is:", options: ["Pre-attachment", "Attachment-in-the-making", "Clear-cut attachment", "Reciprocal"], ans: 2 },
+                { q: "At what age does separation anxiety typically peak?", options: ["3 months", "6–8 months", "12 months", "18 months"], ans: 1 },
+                { q: "A child who waves goodbye and understands mother will return is likely in the:", options: ["Pre-attachment", "Attachment-in-the-making", "Clear-cut", "Reciprocal relationship"], ans: 3 },
+                { q: "The phase where infant smiles indiscriminately at anyone is:", options: ["Pre-attachment", "Clear-cut", "Reciprocal", "Attachment-in-the-making"], ans: 0 },
+                { q: "The second phase is called:", options: ["Pre-attachment", "Attachment-in-the-making", "Clear-cut", "Reciprocal"], ans: 1 }
+            ]},
+            separation: { title: "Separation Anxiety (Protest, Despair, Detachment)", next: "types", questions: [
+                { q: "The first stage of separation response is:", options: ["Protest", "Despair", "Detachment", "Acceptance"], ans: 0 },
+                { q: "During despair, the child:", options: ["Cries loudly", "Becomes quiet and withdrawn", "Ignores parent upon return", "Smiles at everyone"], ans: 1 },
+                { q: "Detachment is characterized by:", options: ["Intense crying", "Apathy and ignoring parent on return", "Clinging", "Anger"], ans: 1 },
+                { q: "Prolonged separation without consistent care may lead to:", options: ["Secure attachment", "Emotional damage and detachment", "Increased trust", "Better social skills"], ans: 1 },
+                { q: "In the protest stage, the child:", options: ["Shows no reaction", "Cries, screams, searches for parent", "Plays happily", "Sleeps"], ans: 1 },
+                { q: "A hospitalized child who appears 'adjusted' but ignores parents upon visit may be in:", options: ["Protest", "Despair", "Detachment", "Secure attachment"], ans: 2 },
+                { q: "The three stages of separation response were described by:", options: ["Ainsworth", "Bowlby", "Erikson", "Freud"], ans: 1 },
+                { q: "A child who becomes quiet and appears hopeless is in which stage?", options: ["Protest", "Despair", "Detachment", "Reunion"], ans: 1 },
+                { q: "Which separation stage is most concerning for long‑term emotional consequences?", options: ["Protest", "Despair", "Detachment", "All are equally concerning"], ans: 2 },
+                { q: "An infant separated from mother for several days may first exhibit:", options: ["Detachment", "Despair", "Protest", "Indifference"], ans: 2 }
+            ]},
+            types: { title: "Ainsworth's Attachment Types", next: "iwm", questions: [
+                { q: "In the Strange Situation, a secure infant:", options: ["Ignores mother", "Is distressed when mother leaves, quickly comforted on return", "Shows contradictory behaviors", "Cries and resists comfort"], ans: 1 },
+                { q: "Avoidant attachment is associated with which caregiver style?", options: ["Responsive", "Rejecting and distant", "Inconsistent", "Frightening"], ans: 1 },
+                { q: "Ambivalent/resistant infants show:", options: ["Little distress", "Intense distress and resist comfort", "No reaction", "Freezing"], ans: 1 },
+                { q: "Disorganized attachment is often seen in infants of caregivers who are:", options: ["Warm and consistent", "Frightening or abusive", "Rejecting", "Overprotective"], ans: 1 },
+                { q: "The Strange Situation was developed by:", options: ["Bowlby", "Ainsworth", "Freud", "Erikson"], ans: 1 },
+                { q: "Which attachment type is considered most adaptive?", options: ["Avoidant", "Secure", "Ambivalent", "Disorganized"], ans: 1 },
+                { q: "A child who shows little distress when mother leaves and ignores her return likely has:", options: ["Secure attachment", "Avoidant attachment", "Ambivalent attachment", "Disorganized attachment"], ans: 1 },
+                { q: "Approximately what percentage of infants in low‑risk samples are securely attached?", options: ["20%", "40%", "60-70%", "90%"], ans: 2 },
+                { q: "A child who freezes, rocks, or shows contradictory behaviors (e.g., approaching then avoiding mother) has:", options: ["Secure", "Avoidant", "Ambivalent", "Disorganized"], ans: 3 },
+                { q: "Inconsistent caregiving is most associated with:", options: ["Secure", "Avoidant", "Ambivalent/resistant", "Disorganized"], ans: 2 }
+            ]},
+            iwm: { title: "Internal Working Model & Deprivation", next: "nursing", questions: [
+                { q: "The Internal Working Model (IWM) is:", options: ["A cognitive map of the hospital", "Mental blueprint from early attachment", "A type of therapy", "A stage of development"], ans: 1 },
+                { q: "Secure attachment leads to an IWM that views self as:", options: ["Worthy and loved", "Unlovable", "Frightened", "Incompetent"], ans: 0 },
+                { q: "Bowlby's maternal deprivation hypothesis emphasizes:", options: ["Importance of continuous care in first 2-3 years", "Need for multiple caregivers", "Role of genetics", "Effect of nutrition"], ans: 0 },
+                { q: "The '44 Juvenile Thieves' study found that many delinquents had experienced:", options: ["Secure attachment", "Early prolonged separations from mother", "Overprotective parenting", "High IQ"], ans: 1 },
+                { q: "Children with a negative IWM are more likely to:", options: ["Trust others easily", "Have relationship difficulties", "Be securely attached", "Be independent"], ans: 1 },
+                { q: "The critical period for attachment formation is:", options: ["Birth to 6 months", "First 2-3 years", "Preschool years", "Adolescence"], ans: 1 },
+                { q: "Maternal deprivation can lead to:", options: ["Emotional coldness, delinquency, low IQ", "Secure attachment", "Higher self-esteem", "Better social skills"], ans: 0 },
+                { q: "A child who was neglected in early childhood may develop an IWM that other people are:", options: ["Trustworthy", "Unpredictable and unreliable", "Always available", "Safe"], ans: 1 },
+                { q: "Bowlby's concept of IWM influences:", options: ["Only childhood behavior", "Life‑long relationships and self‑perception", "Only academic performance", "Only physical health"], ans: 1 },
+                { q: "Which of the following can help repair a negative IWM?", options: ["Consistent, warm caregiving in later childhood", "Punishment", "Isolation", "Ignoring attachment needs"], ans: 0 }
+            ]},
+            nursing: { title: "Nursing Implications & Interventions", next: "flashcards", questions: [
+                { q: "To promote attachment, the nurse should encourage:", options: ["Separation of mother and baby", "Skin‑to‑skin contact and rooming‑in", "Strict schedules", "Formula feeding only"], ans: 1 },
+                { q: "A hospitalized toddler who cries when mother leaves is exhibiting:", options: ["Normal separation anxiety", "Detachment", "Secure attachment only", "Pathology"], ans: 0 },
+                { q: "The nurse should advise parents of a 7‑month‑old who shows stranger anxiety to:", options: ["Leave child with strangers more often", "Provide gradual introductions and reassure child", "Ignore the fear", "Punish the child"], ans: 1 },
+                { q: "Which nursing action supports responsive caregiving?", options: ["Teach parents to recognize infant cues", "Discourage eye contact", "Limit parental visits", "Remove parent during procedures"], ans: 0 },
+                { q: "If a nurse observes a mother who rarely looks at her infant, the nurse should:", options: ["Ignore it", "Assess parent‑infant interaction and provide support", "Separate them", "Report to police"], ans: 1 },
+                { q: "The mnemonic 'C.A.R.E.' for nursing interventions stands for:", options: ["Consistent caregiver, Attentive to cues, Responsive interaction, Encourage bonding", "Clean, Aseptic, Rest, Exercise", "Counsel, Assess, Refer, Educate", "None"], ans: 0 },
+                { q: "A foster parent of a child with history of neglect should be taught to:", options: ["Be strict and distant", "Provide consistent warmth and predictable routines", "Avoid physical contact", "Leave child alone"], ans: 1 },
+                { q: "Preventing unnecessary separation during hospitalization includes:", options: ["Allowing parents to stay 24/7", "Restricting visits", "Sending parents home", "Using only nursery care"], ans: 0 },
+                { q: "When a child exhibits protest (crying) at parent's departure, the nurse should:", options: ["Tell parent to leave quickly", "Reassure parent that it's normal and encourage brief goodbyes", "Separate parent and child completely", "Medicate child"], ans: 1 },
+                { q: "The nurse's role in attachment includes all EXCEPT:", options: ["Supporting breastfeeding", "Promoting eye contact", "Discouraging parental presence during painful procedures", "Teaching about infant cues"], ans: 2 }
+            ]},
+            flashcards: { title: "Flashcards & Mnemonics", next: "final_quiz_sec", questions: [
+                { q: "The mnemonic for Bowlby's 4 phases is:", options: ["P.A.C.R.", "S.A.D.", "P.D.D.", "C.A.R.E."], ans: 0 },
+                { q: "In P.A.C.R., the 'C' stands for:", options: ["Clear-cut attachment", "Crying", "Caregiver", "Cognitive"], ans: 0 },
+                { q: "The mnemonic for Ainsworth's attachment types is:", options: ["S.A.D. (Secure, Avoidant, Disorganized) plus Ambivalent", "P.A.C.R.", "P.D.D.", "C.A.R.E."], ans: 0 },
+                { q: "In S.A.D., 'D' stands for:", options: ["Despair", "Detachment", "Disorganized", "Dismissive"], ans: 2 },
+                { q: "The mnemonic for separation stages is:", options: ["P.D.D. (Protest, Despair, Detachment)", "P.A.C.R.", "S.A.D.", "C.A.R.E."], ans: 0 },
+                { q: "In P.D.D., the second 'D' stands for:", options: ["Despair", "Detachment", "Denial", "Disorganization"], ans: 0 },
+                { q: "The mnemonic for nursing interventions is:", options: ["C.A.R.E.", "P.A.C.R.", "P.D.D.", "S.A.D."], ans: 0 },
+                { q: "In C.A.R.E., the 'R' stands for:", options: ["Responsive interaction", "Rest", "Referral", "Restraint"], ans: 0 },
+                { q: "A flashcard for 'Internal Working Model' includes:", options: ["Mental blueprint from early attachment", "A type of therapy", "A stage of labor", "None"], ans: 0 },
+                { q: "The mnemonic for phases is often recalled as 'Please Always Come Right back' which corresponds to:", options: ["Pre-attachment, Attachment-in-the-making, Clear-cut, Reciprocal", "Protest, Despair, Detachment", "Secure, Avoidant, Disorganized", "None"], ans: 0 }
+            ]}
+        };
+        // Build final 50-item exam
+        let finalQ = [];
+        for(let sec of ['overview','phases','separation','types','iwm','nursing','flashcards']) {
+            finalQ.push(...quizzes[sec].questions.slice(0,7));
+        }
+        while(finalQ.length < 50) finalQ.push({ q: "The Strange Situation was developed by:", options: ["Bowlby", "Ainsworth", "Erikson", "Bandura"], ans: 1 });
+        quizzes.final_quiz = { title: "Final 50‑Item Exam: Bowlby's Attachment Theory", next: null, questions: finalQ };
+
+        let currentQuiz = null;
+        function toggleFlash(el) { const ans = el.querySelector('.flash-answer'); if(ans) ans.classList.toggle('hidden'); }
+        function unlockFirstSection() { if(!unlockedSections.includes('overview')) { unlockedSections.push('overview'); updateSidebarUI(); } showSection('overview'); }
+        function showSection(sectionId) {
+            if (!unlockedSections.includes(sectionId) && sectionId !== 'home') { alert("Complete the Active Recall Quiz at the bottom of the previous section to unlock."); return; }
+            document.querySelectorAll('.content-section').forEach(el => el.classList.add('hidden'));
+            document.getElementById(sectionId)?.classList.remove('hidden');
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('bg-bowlby-light','text-bowlby-dark','border-r-4','border-bowlby-dark'));
+            const activeBtn = document.getElementById('btn-'+sectionId);
+            if(activeBtn) activeBtn.classList.add('bg-bowlby-light','text-bowlby-dark','border-r-4','border-bowlby-dark');
+            if(window.innerWidth < 768) document.getElementById('sidebar').classList.add('hidden');
+        }
+        function updateSidebarUI() {
+            const sections = ['home','overview','phases','separation','types','iwm','nursing','flashcards','final_quiz_sec'];
+            sections.forEach(sec => {
+                const btn = document.getElementById('btn-'+sec);
+                if(!btn) return;
+                const lock = btn.querySelector('.fa-lock'), icon = btn.querySelector('.nav-icon');
+                if(unlockedSections.includes(sec) || sec==='home') { btn.classList.remove('locked-section'); if(lock) lock.classList.add('hidden'); if(icon) icon.classList.remove('hidden'); }
+                else { btn.classList.add('locked-section'); if(lock) lock.classList.remove('hidden'); if(icon) icon.classList.add('hidden'); }
+            });
+        }
+        function openQuiz(sectionId) { currentQuiz = sectionId; const qd = quizzes[sectionId]; if(!qd) return; document.getElementById('quiz-title').innerHTML = qd.title; const container = document.getElementById('quiz-questions-container'); container.innerHTML = ''; qd.questions.forEach((q, idx) => { let html = `<div class="bg-slate-50 p-4 rounded-xl mb-4"><p class="font-bold mb-3">${idx+1}. ${q.q}</p><div class="space-y-2">`; q.options.forEach((opt,oi) => { html += `<label class="flex items-center space-x-3 p-2 rounded-lg hover:bg-white cursor-pointer"><input type="radio" name="q${idx}" value="${oi}" class="form-radio text-bowlby"><span>${opt}</span></label>`; }); html += `</div><div class="feedback-${idx} text-sm mt-2 hidden"></div></div>`; container.innerHTML += html; }); document.getElementById('quiz-submit-btn').classList.remove('hidden'); document.getElementById('quiz-result-container').classList.add('hidden'); document.getElementById('quiz-modal').classList.remove('hidden'); }
+        function closeQuiz() { document.getElementById('quiz-modal').classList.add('hidden'); }
+        function submitQuiz() {
+            const qd = quizzes[currentQuiz];
+            if(!qd) return;
+            let score = 0;
+            for(let i=0; i<qd.questions.length; i++) {
+                const sel = document.querySelector(`input[name="q${i}"]:checked`);
+                if(sel && parseInt(sel.value)===qd.questions[i].ans) score++;
+                const fbDiv = document.querySelector(`.feedback-${i}`);
+                if(fbDiv){
+                    fbDiv.classList.remove('hidden');
+                    const correctTxt = qd.questions[i].options[qd.questions[i].ans];
+                    if(sel && parseInt(sel.value)===qd.questions[i].ans) { fbDiv.innerHTML='<span class="text-green-700">✓ Correct</span>'; fbDiv.parentElement?.classList.add('quiz-feedback-correct'); }
+                    else { const selectedTxt = sel? qd.questions[i].options[parseInt(sel.value)]:"No answer"; fbDiv.innerHTML=`<span class="text-red-700">✗ Incorrect. Correct: ${correctTxt}. You answered: ${selectedTxt}</span>`; fbDiv.parentElement?.classList.add('quiz-feedback-wrong'); }
+                }
+            }
+            let percent = (score/qd.questions.length)*100;
+            let resultDiv = document.getElementById('quiz-result-container');
+            document.getElementById('quiz-submit-btn').classList.add('hidden');
+            resultDiv.classList.remove('hidden');
+            if(percent>=75){
+                if(currentQuiz==='final_quiz'){ resultDiv.innerHTML=`<div class="text-green-600 text-4xl text-center">🎉 Excellent! Score ${score}/${qd.questions.length} (${percent}%)<br>You mastered Bowlby's Attachment Theory</div><button onclick="closeQuiz()" class="mt-4 bg-bowlby text-white px-6 py-2 rounded-xl">Close</button>`; return; }
+                if(quizzes[currentQuiz].next && !unlockedSections.includes(quizzes[currentQuiz].next)) unlockedSections.push(quizzes[currentQuiz].next);
+                if(quizzes[currentQuiz].next === 'flashcards' && !unlockedSections.includes('final_quiz_sec')) unlockedSections.push('final_quiz_sec');
+                updateSidebarUI();
+                resultDiv.innerHTML=`<div class="text-green-600 text-3xl text-center">✅ Passed! (${score}/${qd.questions.length})</div><button onclick="closeQuiz(); showSection('${quizzes[currentQuiz].next}')" class="mt-4 bg-green-600 text-white px-6 py-2 rounded-xl">Unlock Next Section</button>`;
+            } else { resultDiv.innerHTML=`<div class="text-red-600 text-3xl text-center">❌ Failed: ${score}/${qd.questions.length} (${percent}%)<br>Need 75%</div><button onclick="openQuiz('${currentQuiz}')" class="mt-4 bg-slate-600 text-white px-6 py-2 rounded-xl">Try Again</button>`; }
+        }
+        function toggleRecallMode() { const active = !document.body.classList.contains('recall-mode'); const toggle=document.getElementById('recall-toggle'),knob=document.getElementById('recall-knob'); if(active){ document.body.classList.add('recall-mode'); toggle.classList.add('bg-bowlby-dark'); knob.classList.add('translate-x-6'); } else { document.body.classList.remove('recall-mode'); toggle.classList.remove('bg-bowlby-dark'); knob.classList.remove('translate-x-6'); } }
+        function toggleMobileMenu() { const s=document.getElementById('sidebar'); if(s.classList.contains('hidden')) s.classList.remove('hidden','flex','absolute','h-full','z-50'); else s.classList.add('hidden'); }
+        document.addEventListener('DOMContentLoaded', () => { updateSidebarUI(); document.querySelectorAll('.reveal-text').forEach(el => el.addEventListener('click', function(){ if(document.body.classList.contains('recall-mode')) this.classList.toggle('revealed'); })); });
+    </script>
+</body>
+</html>
